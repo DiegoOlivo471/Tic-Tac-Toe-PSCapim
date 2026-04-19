@@ -7,6 +7,7 @@
 # 5. Repeat
 
 import time
+import random
 
 # Defining main variables
 board = ["-", "-", "-",
@@ -15,6 +16,30 @@ board = ["-", "-", "-",
 currentPlayer = "X"       # Every game starts with the X player
 winner = None
 gameRunning = True
+gameMode = None
+
+def select_game_mode():
+    """
+    Asks the player to choose between the PlayerVSPlayer (PvP) or PlayerVSComputer (PvC) modes.
+    """
+    global gameMode
+    print("Select game mode:")
+    print("1 - Player VS Player")
+    print("2 - Player VS Computer\n")
+    choice = input("Enter 1 or 2: ")
+
+    if choice == "1":
+        gameMode = "pvp"
+        print("You selected the Player VS Player mode!\n")
+        time.sleep(1)
+    elif choice == "2":
+        gameMode = "pvc"
+        print("You selected the Player VS Computer mode!\n")
+        time.sleep(1)
+    else:
+        print("Invalid choice. Choose again.\n")
+        time.sleep(1)
+        select_game_mode()
 
 def print_board():
     print("-------------")
@@ -49,7 +74,7 @@ def playerInput():
     print("Value cannot be used. Insert another one, please.")
     playerInput()
 
-# Checking for wins
+# Checking for wins or ties
 def check_rows():
     """
     Checks if there is a horizontal line (row) of "X"s or "O"s.
@@ -125,10 +150,26 @@ def switch_players():
     elif currentPlayer == "O":
         currentPlayer = "X"
 
+def computer_move():
+    """
+    Randomly selects an available position on the board.
+    Computer plays as "O".
+    """
+    available = [i for i, spot in enumerate(board) if spot == "-"]
+    choice = random.choice(available)
+    board[choice] = currentPlayer
+
 explain_board()
+select_game_mode()
 while gameRunning:
     print_board()
-    playerInput()
+
+    if gameMode == "pvc" and currentPlayer == "O":
+        print("Computer is thinking...\n")
+        time.sleep(1)
+        computer_move()
+    else:
+        playerInput()
 
     check_win()
     check_tie()
