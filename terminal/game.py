@@ -14,15 +14,16 @@ board = ["-", "-", "-",
          "-", "-", "-",
          "-", "-", "-"]
 currentPlayer = "X"       # Every game starts with the X player
-winner = None
 gameRunning = True
 gameMode = None
+difficultyLevel = None
 
 def select_game_mode():
     """
     Asks the player to choose between the PlayerVSPlayer (PvP) or PlayerVSComputer (PvC) modes.
     """
     global gameMode
+    global difficultyLevel
     print("Select game mode:")
     print("1 - Player VS Player")
     print("2 - Player VS Computer\n")
@@ -36,6 +37,19 @@ def select_game_mode():
         gameMode = "pvc"
         print("You selected the Player VS Computer mode!\n")
         time.sleep(1)
+
+        print("Select your difficulty level: ")
+        print("1 - Easy Mode")
+        print("2 - Hard Mode\n")
+        while difficultyLevel != "easy" and difficultyLevel != "hard":
+            computer_mode = input("Enter 1 or 2: ")
+            if computer_mode == "1":
+                difficultyLevel = "easy"
+            elif computer_mode == "2":
+                difficultyLevel = "hard"
+            else:
+                print("Please, insert a valid option.\n")
+                time.sleep(0.5)
     else:
         print("Invalid choice. Choose again.\n")
         time.sleep(1)
@@ -75,50 +89,20 @@ def playerInput():
     playerInput()
 
 # Checking for wins or ties
-def check_rows():
+def check_win():
     """
-    Checks if there is a horizontal line (row) of "X"s or "O"s.
+    Checks for winning patterns in the rows, columns and diagonals.
     """
-    global winner
-    if board[0] == board[1] == board[2] and board[0] != '-':
-        winner = board[0]
-        return True
-    elif board[3] == board[4] == board[5] and board[3] != "-":
-        winner = board[3]
-        return True
-    elif board[6] == board[7] == board[8] and board[6] != "-":
-        winner = board[6]
-        return True
-    return False
-
-def check_columns():
-    """
-    Checks if there is a vertical line (column) of "X"s or "O"s.
-    """
-    global winner
-    if board[0] == board[3] == board[6] and board[0] != '-':
-        winner = board[0]
-        return True
-    elif board[1] == board[4] == board[7] and board[1] != '-':
-        winner = board[1]
-        return True
-    elif board[2] == board[5] == board[8] and board[2] != '-':
-        winner = board[2]
-        return True
-    return False
-
-def check_diagonals():
-    """
-    Checks if there is a diagonal line of "X"s or "O"s.
-    """
-    global winner
-    if board[0] == board[4] == board[8] and board[0] != "-":
-        winner = board[0]
-        return True
-    elif board[6] == board[4] == board[2] and board[6] != "-":
-        winner = board[6]
-        return True
-    return False
+    global gameRunning
+    combos = [
+        [0,1,2],[3,4,5],[6,7,8],  # rows
+        [0,3,6],[1,4,7],[2,5,8],  # columns
+        [0,4,8],[2,4,6]           # diagonals
+    ]
+    if any(board[a] == board[b] == board[c] == currentPlayer for a,b,c in combos):
+        gameRunning = False
+        print_board()
+        print(f"The winner is {currentPlayer}!")
 
 def check_tie():
     """
@@ -130,16 +114,6 @@ def check_tie():
         print("It's a tie!")
         gameRunning = False
 
-def check_win():
-    """
-    Calls all check functions and checks 
-    """
-    global gameRunning
-    if check_rows() or check_columns() or check_diagonals():
-        gameRunning = False
-        print_board()
-        print(f"The winner is {winner}!")
-
 def switch_players():
     """
     Changes the turn for the next player.
@@ -150,7 +124,7 @@ def switch_players():
     elif currentPlayer == "O":
         currentPlayer = "X"
 
-def computer_move():
+def computer_move_random():
     """
     Randomly selects an available position on the board.
     Computer plays as "O".
@@ -158,6 +132,66 @@ def computer_move():
     available = [i for i, spot in enumerate(board) if spot == "-"]
     choice = random.choice(available)
     board[choice] = currentPlayer
+
+# Separate function for the minimax algorithm
+def check_winner_minimax(player):
+    """
+    Returns True if the given player has won. Used internally by minimax.
+    """
+    combos = [
+        [0,1,2],[3,4,5],[6,7,8],  # rows
+        [0,3,6],[1,4,7],[2,5,8],  # columns
+        [0,4,8],[2,4,6]           # diagonals
+    ]
+    return any(board[a] == board[b] == board[c] == player for a,b,c in combos)
+
+# Minimax AI algorithm implementation
+def minimax(is_maximizing):
+    """
+    Recursively evaluates all possible moves and returns the best score.
+    """
+    # Base cases: check terminal states
+    if check_winner_minimax("O"):
+        return 10
+    if check_winner_minimax("X"):
+        return -10
+    if "-" not in board:
+        return 0
+
+    if is_maximizing:
+        best_score = -1000
+        for i in range(9):
+            if board[i] == "-":
+                board[i] = "O"
+                score = minimax(False)
+                board[i] = "-"
+                best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = 1000
+        for i in range(9):
+            if board[i] == "-":
+                board[i] = "X"
+                score = minimax(True)
+                board[i] = "-"
+                best_score = min(score, best_score)
+        return best_score
+
+def computer_move_smart():
+    """
+    Uses minimax to select the best available position on the board.
+    """
+    best_score = -1000
+    best_move = None
+    for i in range(9):
+        if board[i] == "-":
+            board[i] = "O"
+            score = minimax(False)
+            board[i] = "-"
+            if score > best_score:
+                best_score = score
+                best_move = i
+    board[best_move] = "O"
 
 explain_board()
 select_game_mode()
@@ -167,7 +201,10 @@ while gameRunning:
     if gameMode == "pvc" and currentPlayer == "O":
         print("Computer is thinking...\n")
         time.sleep(1)
-        computer_move()
+        if difficultyLevel == "easy":
+            computer_move_random()
+        elif difficultyLevel == "hard":
+            computer_move_smart()
     else:
         playerInput()
 
