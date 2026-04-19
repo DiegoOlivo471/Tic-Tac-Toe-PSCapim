@@ -79,12 +79,23 @@ def explain_board():
 def playerInput():
     """
     Receives a player input and updates the game board, recursively.
+    Enter 'r' at any time to restart the game.
     """
-    inp = int(input("Enter a value between 1-9: "))
-    if inp >= 1 and inp <= 9 and board[inp-1] == "-":
-        board[inp-1] = currentPlayer
-        return
+    global board, currentPlayer, gameRunning
     
+    inp = input("Enter a value between 1-9 (or 'r' to restart): ").strip().lower()
+
+    if inp == "r":
+        board = ["-"] * 9
+        currentPlayer = "O"
+        gameRunning = True
+        print("\nGame restarted!\n")
+        return
+
+    if inp.isdigit() and 1 <= int(inp) <= 9 and board[int(inp)-1] == "-":
+        board[int(inp)-1] = currentPlayer
+        return
+
     print("Value cannot be used. Insert another one, please.")
     playerInput()
 
@@ -193,23 +204,57 @@ def computer_move_smart():
                 best_move = i
     board[best_move] = "O"
 
-explain_board()
-select_game_mode()
-while gameRunning:
-    print_board()
-
-    if gameMode == "pvc" and currentPlayer == "O":
-        print("Computer is thinking...\n")
-        time.sleep(1)
-        if difficultyLevel == "easy":
-            computer_move_random()
-        elif difficultyLevel == "hard":
-            computer_move_smart()
+def play_again():
+    """
+    Asks the player if they want to play again and resets the game state.
+    """
+    global board, currentPlayer, gameRunning, gameMode, difficultyLevel
+    print("\nPlay again?")
+    print("1 - Yes, same settings")
+    print("2 - Yes, change mode")
+    print("3 - No, quit\n")
+    choice = input("Enter 1, 2 or 3: ")
+    if choice == "1":
+        board = ["-"] * 9
+        currentPlayer = "X"
+        gameRunning = True
+    elif choice == "2":
+        board = ["-"] * 9
+        currentPlayer = "X"
+        gameRunning = True
+        gameMode = None
+        difficultyLevel = None
+        select_game_mode()
+    elif choice == "3":
+        print("Thanks for playing!")
+        return "quit"
     else:
-        playerInput()
+        return play_again()
 
-    check_win()
-    check_tie()
+if __name__ == "__main__":
+    explain_board()
+    select_game_mode()
 
-    if gameRunning:
-        switch_players()
+    while True:
+        while gameRunning:
+            print_board()
+
+            if gameMode == "pvc" and currentPlayer == "O":
+                print("Computer is thinking...\n")
+                time.sleep(1)
+                if difficultyLevel == "easy":
+                    computer_move_random()
+                elif difficultyLevel == "hard":
+                    computer_move_smart()
+            else:
+                playerInput()
+
+            check_win()
+            check_tie()
+
+            if gameRunning:
+                switch_players()
+        
+        result = play_again()
+        if result == "quit":
+            break
