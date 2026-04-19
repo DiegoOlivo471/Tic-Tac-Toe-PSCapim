@@ -1,0 +1,140 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Georgia', serif;
+  background: #f7f6f3;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+}
+
+.container {
+  width: 340px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  margin-bottom: 32px;
+  color: #1a1a1a;
+}
+
+/* --- Screens --- */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* --- Menu --- */
+.menu-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 14px;
+}
+
+.menu-btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.menu-btn:hover { background: #f0ede8; border-color: #bbb; }
+.menu-btn.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+.menu-btn-group { margin-bottom: 24px; }
+
+.start-btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.start-btn:hover { opacity: 0.85; }
+.start-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* --- Difficulty section --- */
+.difficulty-section { display: none; margin-top: 4px; }
+.difficulty-section.visible { display: block; }
+
+/* --- Game board --- */
+.status {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 32px;
+  font-weight: normal;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell:hover:not(.taken) { background: #f0ede8; }
+.cell.taken { cursor: default; }
+.cell.win { background: #1a1a1a; color: #fff; }
+
+/* --- Buttons --- */
+.restart-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.restart-btn:hover { border-color: #aaa; color: #1a1a1a; }
+
+.back-btn {
+  display: inline-block;
+  margin-top: 14px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #aaa;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.back-btn:hover { color: #555; }
