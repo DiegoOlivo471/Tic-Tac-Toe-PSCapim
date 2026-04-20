@@ -87,10 +87,10 @@ def playerInput():
 
     if inp == "r":
         board = ["-"] * 9
-        currentPlayer = "O"
+        currentPlayer = "X"
         gameRunning = True
         print("\nGame restarted!\n")
-        return
+        return "restart"
 
     if inp.isdigit() and 1 <= int(inp) <= 9 and board[int(inp)-1] == "-":
         board[int(inp)-1] = currentPlayer
@@ -247,7 +247,9 @@ if __name__ == "__main__":
                 elif difficultyLevel == "hard":
                     computer_move_smart()
             else:
-                playerInput()
+                result = playerInput()
+                if result == "restart":
+                    continue  # skips check_win, check_tie and switch_players
 
             check_win()
             check_tie()
